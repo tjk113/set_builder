@@ -1,5 +1,5 @@
-# List Comprehender
-A list comprehension interpreter with haskell-like / "set builder"-like syntax
+# SetBuilder
+A set builder notation compiler with haskell-like syntax
 ## Syntax
 `{ <element operation> | {element filter} in [<range min> .. <range max>] }`
 - Element operation: a calculation involving an element variable  
