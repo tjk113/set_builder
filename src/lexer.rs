@@ -53,10 +53,14 @@ impl Lexer {
         println!("Error: {}", message);
     }
 
-    fn handle_number(&mut self, tokens: &mut Vec<Token>, cur_char: char, negative: bool) {
+    fn handle_number(&mut self, tokens: &mut Vec<Token>, cur_char: char) {
         let mut number: String = cur_char.to_string();
         while let Some(cur_char) = self.peek() {
-            if cur_char.is_digit(10) || cur_char == '.' {
+            if cur_char.is_digit(10) || cur_char == '.' || cur_char == '-' {
+                // Don't parse a range as a decimal point
+                if cur_char == '.' && self.peek().unwrap() == '.' {
+                    break;
+                }
                 number += cur_char.to_string().as_str();
                 self.next();
             }
@@ -64,12 +68,7 @@ impl Lexer {
                 break;
             }
         }
-        let mut final_number: f32 = number.parse().unwrap();
-        // Make number negative if need be
-        if negative {
-            final_number = -final_number;
-        }
-
+        let final_number: f32 = number.parse().unwrap();
         tokens.push(Token::Number(final_number));
     }
 
@@ -87,14 +86,14 @@ impl Lexer {
                 '-' => {
                     // Test to see if the next character is a number
                     let next_character = self.peek().unwrap();
-                    for char_digit in '0'..='9' {
-                        if next_character == char_digit {
-                            self.handle_number(&mut tokens, cur_char, true);
-                        }
+                    if next_character.is_digit(10) {
+                        self.handle_number(&mut tokens, cur_char);
                     }
                     // If it's not a negative number, it's
                     // just a regular subtraction symbol
-                    tokens.push(Token::Subtract)
+                    else {
+                        tokens.push(Token::Subtract)
+                    }
                 },
                 '*' => tokens.push(Token::Multiply),
                 '/' => {
@@ -153,7 +152,7 @@ impl Lexer {
                         self.next();
                     }
                 },
-                '0'..='9' => self.handle_number(&mut tokens, cur_char, false),
+                '0'..='9' => self.handle_number(&mut tokens, cur_char),
                 'i' => {
                     if self.peek().unwrap() == 'n' {
                         if self.peek_ahead(1).unwrap() == ' ' {

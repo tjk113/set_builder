@@ -39,7 +39,14 @@ impl CGenerator {
             Operation::IntDivide => format!("(int)({} / {:.5}f)", self.ast.element_filter.identifier, self.ast.element_filter.operand),
             Operation::Modulus => format!("fmod({}, {:.5}f)", self.ast.element_filter.identifier, self.ast.element_filter.operand),
             Operation::Power => format!("pow({},{:.5}f)", self.ast.element_filter.identifier, self.ast.element_filter.operand),
-            Operation::None => format!("{}", self.ast.element_filter.identifier),
+            Operation::None => {
+                if self.ast.element_filter.comparison != Comparator::None {
+                    format!("{}", self.ast.element_filter.identifier)
+                }
+                else {
+                    format!("{}", 1)
+                }
+            }
         };
         let comparison = match self.ast.element_filter.comparison {
             Comparator::Less => format!("< {:.5}f", self.ast.element_filter.compare_to),
