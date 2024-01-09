@@ -135,7 +135,7 @@ pub fn parse(parser: &mut Parser) -> SetBuilder {
                         todo!("Parser range error handling")
                     }
                 }
-                else if element_filter.comparison != Comparator::None {
+                else if element_filter.comparison == Comparator::None {
                     element_filter.operand = number;
                 }
                 else {
@@ -154,5 +154,5 @@ pub fn parse(parser: &mut Parser) -> SetBuilder {
             Token::End => break
         }
     }
-    SetBuilder { range, element_operation, element_filter }
+    SetBuilder::new(range, element_operation, element_filter)
 }

@@ -1,6 +1,3 @@
-use std::str::Chars;
-use crate::setbuilder::SetBuilder;
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     Identifier(String),
@@ -32,11 +29,6 @@ pub struct Lexer {
     src: String
 }
 
-// TODO: remove
-fn print_type_of<T>(_: &T) {
-    println!("{}", std::any::type_name::<T>())
-}
-
 impl Lexer {
     pub fn new(src: String) -> Lexer {
         Lexer{current: 0, src: src}
@@ -63,7 +55,7 @@ impl Lexer {
     fn handle_number(&mut self, tokens: &mut Vec<Token>, cur_char: char, negative: bool) {
         let mut number: String = cur_char.to_string();
         while let Some(cur_char) = self.peek() {
-            if cur_char.is_digit(10) {
+            if cur_char.is_digit(10) || cur_char == '.' {
                 number += cur_char.to_string().as_str();
                 self.next();
             }
@@ -107,6 +99,14 @@ impl Lexer {
                 '/' => tokens.push(Token::Divide),
                 '%' => tokens.push(Token::Modulus),
                 '^' => tokens.push(Token::Power),
+                '!' => {
+                    if self.peek().unwrap() == '=' {
+                        tokens.push(Token::NotEqual);
+                    }
+                    else {
+                        self.throw_error("Unexpected operator. Did you mean \"!=\"?");
+                    }
+                }
                 '=' => tokens.push(Token::Equal),
                 '<' => {
                     let next_char = self.peek().unwrap();

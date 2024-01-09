@@ -34,7 +34,6 @@ impl ElementOperation {
     pub fn new() -> Self {
         ElementOperation { operation: Operation::None, identifier: String::new(), operand: f32::INFINITY }
     }
-    pub fn evaluate(&self) {}
 }
 
 #[derive(Debug, Clone)]
@@ -50,7 +49,6 @@ impl ElementFilter {
     pub fn new() -> Self {
         ElementFilter { operation: Operation::None, identifier: String::new(), operand: f32::INFINITY, comparison: Comparator::None, compare_to: f32::INFINITY }
     }
-    pub fn evaluate(&self) {}
 }
 
 #[derive(Debug, Clone)]
