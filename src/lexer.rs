@@ -111,6 +111,7 @@ impl Lexer {
                 '!' => {
                     if self.peek().unwrap() == '=' {
                         tokens.push(Token::NotEqual);
+                        self.next();
                     }
                     else {
                         self.throw_error("Unexpected operator. Did you mean \"!=\"?");

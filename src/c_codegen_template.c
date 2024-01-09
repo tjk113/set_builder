@@ -22,7 +22,7 @@ int main() {
 
     *output_ptr = '[';
     output_ptr++;
-    for (float x = range_start; x <= range_end; x++) {
+    for (int x = range_start; x <= range_end; x++) {
         if (!element_filter(x))
             continue;
         float output_num = element_operation(x);
