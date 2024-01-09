@@ -24,7 +24,7 @@ impl CGenerator {
             Operation::Divide => format!("{} /= {:.5}f", self.ast.element_operation.identifier, self.ast.element_operation.operand),
             Operation::IntDivide => format!("{} = (int)({} / {})", self.ast.element_operation.identifier, self.ast.element_operation.identifier, self.ast.element_operation.operand),
             Operation::Modulus => format!("{} = fmod({}, {:.5}f)", self.ast.element_operation.identifier, self.ast.element_operation.identifier, self.ast.element_operation.operand),
-            Operation::Power => format!("{} = pow({},{:.5}f)", self.ast.element_operation.identifier, self.ast.element_operation.identifier, self.ast.element_operation.operand),
+            Operation::Power => format!("{} = powf({},{:.5}f)", self.ast.element_operation.identifier, self.ast.element_operation.identifier, self.ast.element_operation.operand),
             Operation::None => String::from(""),
         };
         self.output = self.output.replace("ELEMENT_OPERATION_DEFINITION", generated.as_str());
@@ -38,7 +38,7 @@ impl CGenerator {
             Operation::Divide => format!("{} / {:.5}f", self.ast.element_filter.identifier, self.ast.element_filter.operand),
             Operation::IntDivide => format!("(int)({} / {:.5}f)", self.ast.element_filter.identifier, self.ast.element_filter.operand),
             Operation::Modulus => format!("fmod({}, {:.5}f)", self.ast.element_filter.identifier, self.ast.element_filter.operand),
-            Operation::Power => format!("pow({},{:.5}f)", self.ast.element_filter.identifier, self.ast.element_filter.operand),
+            Operation::Power => format!("powf({},{:.5}f)", self.ast.element_filter.identifier, self.ast.element_filter.operand),
             Operation::None => {
                 if self.ast.element_filter.comparison != Comparator::None {
                     format!("{}", self.ast.element_filter.identifier)
