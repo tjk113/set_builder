@@ -6,6 +6,7 @@ pub enum Operation {
     Subtract,
     Multiply,
     Divide,
+    IntDivide,
     Modulus,
     Power,
     None

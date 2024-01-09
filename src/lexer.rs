@@ -12,6 +12,7 @@ pub enum Token {
     Subtract,
     Multiply,
     Divide,
+    IntDivide,
     Modulus,
     Power,
     Equal,
@@ -96,7 +97,15 @@ impl Lexer {
                     tokens.push(Token::Subtract)
                 },
                 '*' => tokens.push(Token::Multiply),
-                '/' => tokens.push(Token::Divide),
+                '/' => {
+                    if self.peek().unwrap() == '/' {
+                        tokens.push(Token::IntDivide);
+                        self.next();
+                    }
+                    else {
+                        tokens.push(Token::Divide)
+                    }
+                },
                 '%' => tokens.push(Token::Modulus),
                 '^' => tokens.push(Token::Power),
                 '!' => {

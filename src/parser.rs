@@ -98,6 +98,14 @@ pub fn parse(parser: &mut Parser) -> SetBuilder {
                     element_filter.operation = Operation::Divide;
                 }
             },
+            &Token::IntDivide => {
+                if !in_predicate {
+                    element_operation.operation = Operation::IntDivide;
+                }
+                else {
+                    element_filter.operation = Operation::IntDivide;
+                }
+            },
             &Token::Modulus => {
                 if !in_predicate {
                     element_operation.operation = Operation::Modulus;
