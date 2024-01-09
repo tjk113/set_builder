@@ -1,10 +1,10 @@
 use std::str::Chars;
 use crate::setbuilder::SetBuilder;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     Identifier(String),
-    Number(isize),
+    Number(f32),
     LeftBrace,
     RightBrace,
     LeftBracket,
@@ -18,6 +18,7 @@ pub enum Token {
     Modulus,
     Power,
     Equal,
+    NotEqual,
     Less,
     LessEqual,
     Greater,
@@ -59,6 +60,26 @@ impl Lexer {
         println!("Error: {}", message);
     }
 
+    fn handle_number(&mut self, tokens: &mut Vec<Token>, cur_char: char, negative: bool) {
+        let mut number: String = cur_char.to_string();
+        while let Some(cur_char) = self.peek() {
+            if cur_char.is_digit(10) {
+                number += cur_char.to_string().as_str();
+                self.next();
+            }
+            else {
+                break;
+            }
+        }
+        let mut final_number: f32 = number.parse().unwrap();
+        // Make number negative if need be
+        if negative {
+            final_number = -final_number;
+        }
+
+        tokens.push(Token::Number(final_number));
+    }
+
     pub fn lex(&mut self) -> Option<Vec<Token>> {
         let mut tokens = vec![];
 
@@ -70,26 +91,30 @@ impl Lexer {
                 ']' => tokens.push(Token::RightBracket),
                 '|' => tokens.push(Token::Pipe),
                 '+' => tokens.push(Token::Add),
-                '-' => tokens.push(Token::Subtract),
+                '-' => {
+                    // Test to see if the next character is a number
+                    let next_character = self.peek().unwrap();
+                    for char_digit in '0'..='9' {
+                        if next_character == char_digit {
+                            self.handle_number(&mut tokens, cur_char, true);
+                        }
+                    }
+                    // If it's not a negative number, it's
+                    // just a regular subtraction symbol
+                    tokens.push(Token::Subtract)
+                },
                 '*' => tokens.push(Token::Multiply),
                 '/' => tokens.push(Token::Divide),
                 '%' => tokens.push(Token::Modulus),
                 '^' => tokens.push(Token::Power),
-                '=' => {
-                    if self.next() == Some('=') {
-                        tokens.push(Token::Equal);
-                    }
-                    else {
-                        self.throw_error("Unexpected operator. Did you mean \"==\"?");
-                        return None;
-                    }
-                },
+                '=' => tokens.push(Token::Equal),
                 '<' => {
-                    if self.peek() == Some('=') {
+                    let next_char = self.peek().unwrap();
+                    if next_char == '=' {
                         tokens.push(Token::LessEqual);
                         self.next();
                     }
-                    else if self.peek() == Some(' ') || self.peek().unwrap().is_alphanumeric() {
+                    else if next_char == ' ' || next_char.is_alphanumeric() {
                         tokens.push(Token::Less);
                     }
                     else {
@@ -98,12 +123,13 @@ impl Lexer {
                     }
                 },
                 '>' => {
-                    if self.peek() == Some('=') {
+                    let next_char = self.peek().unwrap();
+                    if next_char == '=' {
                         tokens.push(Token::GreaterEqual);
                         self.next();
                     }
-                    else if self.peek() == Some(' ') || self.peek().unwrap().is_alphanumeric() {
-                        println!("{:?}", self.peek().unwrap());
+                    else if next_char == ' ' || next_char.is_alphanumeric() {
+                        println!("{:?}", next_char);
                         tokens.push(Token::Greater);
                     }
                     else {
@@ -112,27 +138,15 @@ impl Lexer {
                     }
                 },
                 '.' => {
-                    if self.peek() == Some('.') {
+                    if self.peek().unwrap() == '.' {
                         tokens.push(Token::Range);
                         self.next();
                     }
                 },
-                '0'..='9' => {
-                    let mut number: String = cur_char.to_string();
-                    while let Some(cur_char) = self.peek() {
-                        if cur_char.is_digit(10) {
-                            number += cur_char.to_string().as_str();
-                            self.next();
-                        }
-                        else {
-                            break;
-                        }
-                    }
-                    tokens.push(Token::Number(number.parse().unwrap()));
-                },
+                '0'..='9' => self.handle_number(&mut tokens, cur_char, false),
                 'i' => {
-                    if self.peek() == Some('n') {
-                        if self.peek_ahead(1) == Some(' ') {
+                    if self.peek().unwrap() == 'n' {
+                        if self.peek_ahead(1).unwrap() == ' ' {
                             tokens.push(Token::In);
                             self.next();
                             self.next();
@@ -156,8 +170,6 @@ impl Lexer {
             }
         }
         tokens.push(Token::End);
-
-        println!("{:?}", tokens);
 
         Some(tokens)
     }
